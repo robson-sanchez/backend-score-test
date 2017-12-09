@@ -22,17 +22,17 @@ import java.util.Optional;
 @Component
 public class MenuHandler implements ScoreHandler {
 
-  private final MenuScoreManager scoreManager;
+  private final MenuScoreRepository scoreRepository;
 
-  public MenuHandler(MenuScoreManager scoreManager) {
-    this.scoreManager = scoreManager;
+  public MenuHandler(MenuScoreRepository scoreRepository) {
+    this.scoreRepository = scoreRepository;
   }
 
   @Override
   public Mono<ServerResponse> getScore(ServerRequest request) {
     String menu = request.pathVariable("menu");
 
-    Optional<MenuScore> score = scoreManager.getScore(menu);
+    Optional<MenuScore> score = scoreRepository.getScore(menu);
 
     if (score.isPresent()) {
       MenuScore result = score.get();
@@ -82,7 +82,7 @@ public class MenuHandler implements ScoreHandler {
           .body(Mono.just(errorMessage), ErrorMessage.class);
     }
 
-    List<MenuScore> result = scoreManager.searchScore(scoreQuery, comparator);
+    List<MenuScore> result = scoreRepository.searchScore(scoreQuery, comparator);
 
     if (result.isEmpty()) {
       return ServerResponse.noContent().build();

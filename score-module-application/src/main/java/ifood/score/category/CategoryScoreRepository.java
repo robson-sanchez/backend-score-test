@@ -12,30 +12,31 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
  * Created by robson on 03/12/17.
  */
 @Component
-public class CategoryScoreManager {
+public class CategoryScoreRepository {
 
   private Map<Category, CategoryScore> scores = new HashMap<>();
 
-  public CategoryScoreManager() {
-    buildScores();
-  }
+  public CategoryScore updateScore(Category category, double relevance) {
+    CategoryScore score = getScore(category).orElse(new CategoryScore());
+    score.setCategory(category);
+    score.addRelevance(relevance);
 
-  private void buildScores() {
-    Arrays.asList(Category.values()).stream().forEach(category -> {
-      CategoryScore score = new CategoryScore();
-      score.setCategory(category);
-      score.setScore(RandomishPicker._int(1, 100));
+    if (relevance < 0) {
+      score.incrementTotalOrders(-1);
+    } else {
+      score.incrementTotalOrders(1);
+    }
 
-      this.scores.put(category, score);
+    this.scores.put(category, score);
 
-      System.out.println(score);
-    });
+    return score;
   }
 
   public Optional<CategoryScore> getScore(Category category) {

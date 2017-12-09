@@ -32,6 +32,10 @@ public class MenuScore implements Serializable {
     this.relevanceSum = this.relevanceSum.add(BigDecimal.valueOf(relevance));
   }
 
+  public void incrementTotalOrders(int value) {
+    this.totalOrders += value;
+  }
+
   public double getScore() {
     if (totalOrders == 0) {
       return 0;

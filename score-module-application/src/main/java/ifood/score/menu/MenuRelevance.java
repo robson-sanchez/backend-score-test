@@ -1,5 +1,6 @@
 package ifood.score.menu;
 
+import ifood.score.model.ProcessingStatus;
 import ifood.score.order.OrderStatus;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -25,5 +26,7 @@ public class MenuRelevance implements Serializable {
   private Double relevance;
 
   private OrderStatus orderStatus;
+
+  private ProcessingStatus processingStatus = ProcessingStatus.UNPROCESSED;
 
 }

@@ -1,5 +1,6 @@
 package ifood.score.menu;
 
+import ifood.score.model.ProcessingStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -17,17 +18,30 @@ public class MenuRelevanceRepository {
     this.relevances.addAll(relevancesCreated);
   }
 
+  public void updateRelevances(Set<MenuRelevance> relevances) {
+    Set<MenuRelevance> newSet = this.relevances.stream()
+        .filter(item -> !relevances.contains(item))
+        .collect(Collectors.toSet());
+
+    newSet.addAll(relevances);
+
+    this.relevances = newSet;
+  }
+
   public void updateRelevance(MenuRelevance relevance) {
     this.relevances.remove(relevance);
     this.relevances.add(relevance);
   }
 
-  public Set<MenuRelevance> getRelevances(int limit) {
-    return this.relevances.stream().limit(limit).collect(Collectors.toSet());
+  public Set<MenuRelevance> getRelevancesByStatus(ProcessingStatus status, int limit) {
+    return this.relevances.stream()
+        .filter(r -> status.equals(r.getProcessingStatus()))
+        .limit(limit)
+        .collect(Collectors.toSet());
   }
 
-  public void removeRelevances(Set<MenuRelevance> relevancesRemoved) {
-    this.relevances.removeAll(relevancesRemoved);
+  public void removeRelevance(MenuRelevance relevance) {
+    this.relevances.remove(relevance);
   }
 
 }

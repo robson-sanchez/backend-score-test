@@ -17,31 +17,24 @@ import java.util.stream.IntStream;
  * Created by robson on 03/12/17.
  */
 @Component
-public class MenuScoreManager {
+public class MenuScoreRepository {
 
   private Map<String, MenuScore> scores = new HashMap<>();
 
-  public MenuScoreManager() {
-    buildScores();
-  }
+  public MenuScore updateScore(String uuid, double relevance) {
+    MenuScore score = getScore(uuid).orElse(new MenuScore());
+    score.setUuid(UUID.fromString(uuid));
+    score.addRelevance(relevance);
 
-  private void buildScores() {
-    IntStream.range(0, 50).forEach(i -> {
-      MenuScore score = new MenuScore();
-      score.setUuid(UUID.randomUUID());
+    if (relevance < 0) {
+      score.incrementTotalOrders(-1);
+    } else {
+      score.incrementTotalOrders(1);
+    }
 
-      int totalOrders = RandomishPicker._int(300, 500);
-      score.setTotalOrders(totalOrders);
+    this.scores.put(uuid, score);
 
-      IntStream.range(0, totalOrders).forEach(order -> {
-        Integer relevance = RandomishPicker._int(1, 100);
-        score.addRelevance(relevance);
-      });
-
-      System.out.println(score);
-
-      this.scores.put(score.getUuid().toString(), score);
-    });
+    return score;
   }
 
   public Optional<MenuScore> getScore(String uuid) {

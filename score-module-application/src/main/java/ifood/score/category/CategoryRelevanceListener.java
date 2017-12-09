@@ -23,7 +23,7 @@ public class CategoryRelevanceListener {
     this.repository = repository;
   }
 
-  @JmsListener(destination = "menu-relevance")
+  @JmsListener(destination = "category-relevance")
   public void receiveMessage(List<CategoryRelevance> relevances) {
     LOGGER.info("Category relevance received: " + relevances.size());
     repository.addRelevances(relevances);

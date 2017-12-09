@@ -23,10 +23,10 @@ import java.util.Optional;
 @Component
 public class CategoryHandler implements ScoreHandler {
 
-  private final CategoryScoreManager scoreManager;
+  private final CategoryScoreRepository scoreRepository;
 
-  public CategoryHandler(CategoryScoreManager scoreManager) {
-    this.scoreManager = scoreManager;
+  public CategoryHandler(CategoryScoreRepository scoreRepository) {
+    this.scoreRepository = scoreRepository;
   }
 
   @Override
@@ -46,7 +46,7 @@ public class CategoryHandler implements ScoreHandler {
           .body(Mono.just(errorMessage), ErrorMessage.class);
     }
 
-    Optional<CategoryScore> score = scoreManager.getScore(category);
+    Optional<CategoryScore> score = scoreRepository.getScore(category);
 
     if (score.isPresent()) {
       CategoryScore result = score.get();
@@ -96,7 +96,7 @@ public class CategoryHandler implements ScoreHandler {
           .body(Mono.just(errorMessage), ErrorMessage.class);
     }
 
-    List<CategoryScore> result = scoreManager.searchScore(scoreQuery, comparator);
+    List<CategoryScore> result = scoreRepository.searchScore(scoreQuery, comparator);
 
     if (result.isEmpty()) {
       return ServerResponse.noContent().build();
