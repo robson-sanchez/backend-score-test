@@ -1,6 +1,5 @@
 package ifood.score.menu;
 
-import ifood.score.category.CategoryRelevance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jms.annotation.JmsListener;
@@ -18,10 +17,16 @@ public class MenuRelevanceListener {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MenuRelevanceListener.class);
 
-  @JmsListener(destination = "item-relevance")
+  private final MenuRelevanceRepository repository;
+
+  public MenuRelevanceListener(MenuRelevanceRepository repository) {
+    this.repository = repository;
+  }
+
+  @JmsListener(destination = "menu-relevance")
   public void receiveMessage(List<MenuRelevance> relevances) {
-    LOGGER.info("Category relevance received: " + relevances.size());
-    MenuRelevanceRepository.getInstance().addRelevances(relevances);
+    LOGGER.info("Menu relevance received: " + relevances.size());
+    repository.addRelevances(relevances);
   }
 
 }

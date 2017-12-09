@@ -1,19 +1,17 @@
 package ifood.score.category;
 
+import org.springframework.stereotype.Component;
+
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Component
 public class CategoryRelevanceRepository {
 
-  private static final CategoryRelevanceRepository INSTANCE = new CategoryRelevanceRepository();
-
-  private Set<CategoryRelevance> relevances = new HashSet<>();
-
-  public static CategoryRelevanceRepository getInstance() {
-    return INSTANCE;
-  }
+  private Set<CategoryRelevance> relevances = Collections.synchronizedSet(new HashSet<>());
 
   public void addRelevances(List<CategoryRelevance> relevancesCreated) {
     this.relevances.addAll(relevancesCreated);
