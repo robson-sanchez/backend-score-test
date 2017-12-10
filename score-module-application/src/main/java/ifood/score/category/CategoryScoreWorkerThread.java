@@ -1,5 +1,6 @@
 package ifood.score.category;
 
+import com.hazelcast.core.HazelcastInstance;
 import ifood.score.Relevance;
 import ifood.score.ScoreWorkerThread;
 import ifood.score.menu.Category;
@@ -13,13 +14,18 @@ import org.springframework.stereotype.Component;
 public class CategoryScoreWorkerThread extends ScoreWorkerThread<Category> {
 
   public CategoryScoreWorkerThread(CategoryRelevanceRepository relevanceRepository,
-      CategoryScoreRepository scoreRepository) {
-    super(relevanceRepository, scoreRepository);
+      CategoryScoreRepository scoreRepository, HazelcastInstance hazelcastInstance) {
+    super(relevanceRepository, scoreRepository, hazelcastInstance);
   }
 
   @Scheduled(fixedDelay = 2*1000)
   public void checkCategoryRelevances() {
     processRelevances();
+  }
+
+  @Override
+  protected String getLockName() {
+    return "category-lock";
   }
 
   @Override

@@ -4,6 +4,9 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
+import com.hazelcast.config.Config;
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.HazelcastInstance;
 import ifood.score.category.CategoryHandler;
 import ifood.score.menu.MenuHandler;
 import org.springframework.boot.SpringApplication;
@@ -39,4 +42,11 @@ public class Application {
         .andRoute(GET("/v1/score/menu/search"), menuHandler::retrieveScoreByParameter)
         .andRoute(GET("/v1/score/menu/{menu}"), menuHandler::getScore);
   }
+
+  @Bean
+  public HazelcastInstance hazelcastInstance() {
+    Config config = new Config();
+    return Hazelcast.newHazelcastInstance(config);
+  }
+
 }

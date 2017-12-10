@@ -78,6 +78,12 @@
 			<version>1.12.4</version>
 			<scope>provided</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast</artifactId>
+			<version>3.9.1</version>
+		</dependency>
 	</dependencies>
 
 	<repositories>

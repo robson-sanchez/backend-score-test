@@ -1,12 +1,16 @@
 package ifood.score;
 
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.ILock;
 import ifood.score.model.ProcessingStatus;
 import ifood.score.order.OrderStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -22,10 +26,13 @@ public abstract class ScoreWorkerThread<K> {
 
   private final ScoreRepository scoreRepository;
 
+  private final HazelcastInstance hazelcastInstance;
+
   public ScoreWorkerThread(RelevanceRepository relevanceRepository,
-      ScoreRepository scoreRepository) {
+      ScoreRepository scoreRepository, HazelcastInstance hazelcastInstance) {
     this.relevanceRepository = relevanceRepository;
     this.scoreRepository = scoreRepository;
+    this.hazelcastInstance = hazelcastInstance;
   }
 
   @Scheduled(fixedDelay = 2*1000)
@@ -34,9 +41,18 @@ public abstract class ScoreWorkerThread<K> {
   }
 
   protected void processRelevances() {
-    try {
-      // TODO Get global lock
+    String lockName = getLockName();
 
+    Optional<ILock> optionalLock = acquireLock(lockName);
+
+    if (!optionalLock.isPresent()) {
+      LOGGER.error("Fail to acquire global lock " + lockName);
+      return;
+    }
+
+    ILock lock = optionalLock.get();
+
+    try {
       Set<Relevance> relevances =
           relevanceRepository.getRelevancesByStatus(ProcessingStatus.UNPROCESSED, MAX_SIZE);
 
@@ -48,13 +64,16 @@ public abstract class ScoreWorkerThread<K> {
 
       relevanceRepository.updateRelevances(updatedRelevances);
 
-      // TODO Release global lock
+
+      lock.unlock();
 
       updatedRelevances.stream().forEach(relevance -> updateScore(relevance));
     } catch (Exception e) {
       LOGGER.error("Fail to start process", e);
     } finally {
-      // TODO Release lock if not release yet
+      if (lock.isLocked()) {
+        lock.unlock();
+      }
     }
   }
 
@@ -64,10 +83,18 @@ public abstract class ScoreWorkerThread<K> {
   }
 
   private void updateScore(Relevance relevance) {
+    String lockName = getKey(relevance).toString();
+
+    Optional<ILock> optionalLock = acquireLock(lockName);
+
+    if (!optionalLock.isPresent()) {
+      LOGGER.error("Fail to acquire lock " + lockName);
+      return;
+    }
+
+    ILock lock = optionalLock.get();
 
     try {
-      // TODO Get lock for the item
-
       Double value = relevance.getRelevance();
 
       if (!relevance.getOrderStatus().equals(OrderStatus.CHECKOUT)) {
@@ -84,7 +111,9 @@ public abstract class ScoreWorkerThread<K> {
         LOGGER.error("Fail rollback process for item: " + getKey(relevance), e1);
       }
     } finally {
-      // TODO Release lock for item
+      if (lock.isLocked()) {
+        lock.unlock();
+      }
     }
 
   }
@@ -106,6 +135,22 @@ public abstract class ScoreWorkerThread<K> {
       }
     }
   }
+
+  private Optional<ILock> acquireLock(String lockName) {
+    ILock lock = hazelcastInstance.getLock(lockName);
+    boolean locked;
+
+    // Acquire lock
+    try {
+      locked = lock.tryLock(5, TimeUnit.SECONDS, 10, TimeUnit.SECONDS);
+    } catch (InterruptedException e) {
+      return Optional.empty();
+    }
+
+    return locked ? Optional.of(lock) : Optional.empty();
+  }
+
+  protected abstract String getLockName();
 
   protected abstract K getKey(Relevance relevance);
 
