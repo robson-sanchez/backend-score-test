@@ -35,10 +35,29 @@ public class Order implements Serializable {
   private List<Item> items;
 
   public Map<UUID, Double> getItemsRelevance() {
+    Map<UUID, Double> result = new HashMap<>();
+
     OrderSummary summary = getOrderSummary();
 
-    return this.items.stream().collect(Collectors.toMap(Item::getMenuUuid,
-        item -> getItemRelevance(summary.getTotalItems(), summary.getTotalPrice(), item)));
+    Map<UUID, List<Item>> mapping = new HashMap<>();
+
+    for (Item item : items) {
+      UUID menuItem = item.getMenuUuid();
+
+      if (!mapping.containsKey(menuItem)) {
+        mapping.put(menuItem, new ArrayList<>());
+      }
+
+      mapping.get(menuItem).add(item);
+    }
+
+    for (Map.Entry<UUID, List<Item>> entry : mapping.entrySet()) {
+      Double menuRelevance =
+          getItemRelevance(summary.getTotalItems(), summary.getTotalPrice(), entry.getValue());
+      result.put(entry.getKey(), menuRelevance);
+    }
+
+    return result;
   }
 
   public Map<Category, Double> getCategoriesRelevance() {
@@ -60,30 +79,23 @@ public class Order implements Serializable {
 
     for (Map.Entry<Category, List<Item>> entry : mapping.entrySet()) {
       Double categoryRelevance =
-          getCategoryRelevance(summary.getTotalItems(), summary.getTotalPrice(), entry.getValue());
+          getItemRelevance(summary.getTotalItems(), summary.getTotalPrice(), entry.getValue());
       result.put(entry.getKey(), categoryRelevance);
     }
 
     return result;
   }
 
-  private Double getItemRelevance(int totalItems, BigDecimal totalPrice, Item item) {
-    Double itemsQty = item.getQuantity().doubleValue();
-    BigDecimal itemsPrice = getPrice(item);
-
-    return getRelevance(totalItems, totalPrice, itemsQty, itemsPrice);
-  }
-
-  private Double getCategoryRelevance(int totalItems, BigDecimal totalPrice, List<Item> items) {
+  private Double getItemRelevance(int totalItems, BigDecimal totalPrice, List<Item> items) {
     Optional<OrderSummary> summary =
         items.stream().map(item -> new OrderSummary(item.getQuantity(), getPrice(item)))
             .reduce((acc, order) -> {
-              int categoryItems = acc.getTotalItems() + order.getTotalItems();
-              BigDecimal categoryPrice = acc.getTotalPrice().add(order.getTotalPrice());
-              return new OrderSummary(categoryItems, categoryPrice);
+              int menuItems = acc.getTotalItems() + order.getTotalItems();
+              BigDecimal menuPrice = acc.getTotalPrice().add(order.getTotalPrice());
+              return new OrderSummary(menuItems, menuPrice);
             });
 
-    double qty = summary.get().getTotalItems().doubleValue();
+    Double qty = summary.get().getTotalItems().doubleValue();
     BigDecimal price = summary.get().getTotalPrice();
 
     return getRelevance(totalItems, totalPrice, qty, price);
