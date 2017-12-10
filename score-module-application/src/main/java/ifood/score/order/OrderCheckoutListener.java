@@ -29,8 +29,7 @@ public class OrderCheckoutListener {
 
     // PROCESS ORDER (Out of scope)
 
-    messageProducer.sendMenuItemsBulkMessage(order, OrderStatus.CHECKOUT);
-    messageProducer.sendCategoriesBulkMessage(order, OrderStatus.CHECKOUT);
+    messageProducer.sendEvents(order, OrderStatus.CHECKOUT);
   }
 
 }

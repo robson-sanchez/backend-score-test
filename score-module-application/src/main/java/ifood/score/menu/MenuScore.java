@@ -1,14 +1,12 @@
 package ifood.score.menu;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import ifood.score.Score;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.UUID;
 
 /**
@@ -20,28 +18,8 @@ import java.util.UUID;
 @Setter
 @ToString
 @EqualsAndHashCode(of = {"uuid"})
-public class MenuScore implements Serializable {
+public class MenuScore extends Score implements Serializable {
 
   private UUID uuid;
 
-  @JsonIgnore private BigDecimal relevanceSum = BigDecimal.ZERO;
-
-  @JsonIgnore private long totalOrders;
-
-  public void addRelevance(double relevance) {
-    this.relevanceSum = this.relevanceSum.add(BigDecimal.valueOf(relevance));
-  }
-
-  public void incrementTotalOrders(int value) {
-    this.totalOrders += value;
-  }
-
-  public double getScore() {
-    if (totalOrders == 0) {
-      return 0;
-    }
-
-    BigDecimal orders = BigDecimal.valueOf(totalOrders);
-    return relevanceSum.divide(orders, 10, BigDecimal.ROUND_HALF_EVEN).doubleValue();
-  }
 }

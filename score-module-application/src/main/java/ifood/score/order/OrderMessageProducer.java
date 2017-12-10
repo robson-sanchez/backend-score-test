@@ -22,7 +22,12 @@ public class OrderMessageProducer {
     this.jmsTemplate = jmsTemplate;
   }
 
-  public void sendMenuItemsBulkMessage(Order order, OrderStatus status) {
+  public void sendEvents(Order order, OrderStatus status) {
+    sendMenuItemsBulkMessage(order, status);
+    sendCategoriesBulkMessage(order, status);
+  }
+
+  private void sendMenuItemsBulkMessage(Order order, OrderStatus status) {
     List<MenuRelevance> menuItems = order.getItemsRelevance().entrySet().stream().map(entry -> {
       MenuRelevance relevance = new MenuRelevance();
 
@@ -37,7 +42,7 @@ public class OrderMessageProducer {
     this.jmsTemplate.convertAndSend("menu-relevance", menuItems);
   }
 
-  public void sendCategoriesBulkMessage(Order order, OrderStatus status) {
+  private void sendCategoriesBulkMessage(Order order, OrderStatus status) {
     List<CategoryRelevance> categories = order.getCategoriesRelevance().entrySet()
         .stream().map(entry -> {
           CategoryRelevance relevance = new CategoryRelevance();

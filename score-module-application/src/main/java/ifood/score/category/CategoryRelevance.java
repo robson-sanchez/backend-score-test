@@ -1,14 +1,11 @@
 package ifood.score.category;
 
+import ifood.score.Relevance;
 import ifood.score.menu.Category;
-import ifood.score.model.ProcessingStatus;
-import ifood.score.order.OrderStatus;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
-import java.io.Serializable;
 import java.util.UUID;
 
 /**
@@ -16,18 +13,11 @@ import java.util.UUID;
  */
 @Getter
 @Setter
-@ToString
 @EqualsAndHashCode(of = {"order", "category"})
-public class CategoryRelevance implements Serializable {
+public class CategoryRelevance extends Relevance {
 
   private UUID order;
 
   private Category category;
-
-  private Double relevance;
-
-  private OrderStatus orderStatus;
-
-  private ProcessingStatus processingStatus = ProcessingStatus.UNPROCESSED;
 
 }

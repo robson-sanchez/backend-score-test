@@ -31,8 +31,7 @@ public class OrderCancelationListener {
     Order order = OrderRepository.getInstance().getOrder(uuid);
 
     if (order != null) {
-      messageProducer.sendMenuItemsBulkMessage(order, OrderStatus.CANCELLATION);
-      messageProducer.sendCategoriesBulkMessage(order, OrderStatus.CANCELLATION);
+      messageProducer.sendEvents(order, OrderStatus.CANCELLATION);
     }
   }
 
