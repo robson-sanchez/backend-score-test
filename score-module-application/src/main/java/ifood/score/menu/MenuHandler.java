@@ -19,7 +19,7 @@ public class MenuHandler extends ScoreHandler<String, MenuScore> {
   }
 
   @Override
-  protected Optional<String> getParameter(ServerRequest request) {
+  public Optional<String> getParameter(ServerRequest request) {
     return Optional.ofNullable(request.pathVariable("menu"));
   }
 

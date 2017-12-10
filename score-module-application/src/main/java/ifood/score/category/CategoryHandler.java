@@ -20,7 +20,7 @@ public class CategoryHandler extends ScoreHandler<Category, CategoryScore> {
   }
 
   @Override
-  protected Optional<Category> getParameter(ServerRequest request) {
+  public Optional<Category> getParameter(ServerRequest request) {
     String categoryParam = request.pathVariable("category");
 
     try {

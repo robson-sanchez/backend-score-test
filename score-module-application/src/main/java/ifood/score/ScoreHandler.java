@@ -100,6 +100,6 @@ public abstract class ScoreHandler<K, V extends Score> {
     return ServerResponse.ok().body(Flux.fromIterable(result), returnType);
   }
 
-  protected abstract Optional<K> getParameter(ServerRequest request);
+  public abstract Optional<K> getParameter(ServerRequest request);
 
 }
