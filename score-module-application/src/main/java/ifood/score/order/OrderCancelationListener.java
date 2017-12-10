@@ -19,8 +19,11 @@ public class OrderCancelationListener {
 
   private final OrderMessageProducer messageProducer;
 
-  public OrderCancelationListener(OrderMessageProducer messageProducer) {
+  private final OrderRepository repository;
+
+  public OrderCancelationListener(OrderMessageProducer messageProducer, OrderRepository repository) {
     this.messageProducer = messageProducer;
+    this.repository = repository;
   }
 
   @JmsListener(destination = "cancel-order")
@@ -28,7 +31,7 @@ public class OrderCancelationListener {
     LOGGER.info("Order cancellation: " + uuid);
     // PROCESS ORDER (Out of scope)
 
-    Order order = OrderRepository.getInstance().getOrder(uuid);
+    Order order = repository.getOrder(uuid);
 
     if (order != null) {
       messageProducer.sendEvents(order, OrderStatus.CANCELLATION);

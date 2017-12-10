@@ -31,7 +31,7 @@ public class Order implements Serializable {
   private UUID customerUuid;
   private UUID restaurantUuid;
   private UUID addressUuid;
-  private Date confirmedAt;
+  private Long confirmedAt;
   private List<Item> items;
 
   public Map<UUID, Double> getItemsRelevance() {

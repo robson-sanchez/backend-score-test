@@ -17,15 +17,18 @@ public class OrderCheckoutListener {
 
   private final OrderMessageProducer messageProducer;
 
-  public OrderCheckoutListener(OrderMessageProducer messageProducer) {
+  private final OrderRepository repository;
+
+  public OrderCheckoutListener(OrderMessageProducer messageProducer, OrderRepository repository) {
     this.messageProducer = messageProducer;
+    this.repository = repository;
   }
 
   @JmsListener(destination = "checkout-order")
   public void receiveMessage(Order order) {
     LOGGER.info("Order received: " + order);
 
-    OrderRepository.getInstance().addOrder(order);
+    repository.addOrder(order);
 
     // PROCESS ORDER (Out of scope)
 

@@ -25,7 +25,7 @@ public class OrderPicker implements Picker<Order> {
 		order.setRestaurantUuid(UUID.randomUUID());
 		order.setCustomerUuid(UUID.randomUUID());
 		order.setAddressUuid(UUID.randomUUID());
-		order.setConfirmedAt(new Date());
+		order.setConfirmedAt(System.currentTimeMillis());
 		order.setItems(items);
 		return order;
 	}
