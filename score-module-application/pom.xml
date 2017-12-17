@@ -86,6 +86,16 @@
 		</dependency>
 	</dependencies>
 
+	<build>
+		<finalName>score</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
 	<repositories>
 		<!-- Repositories to allow snapshot and milestone BOM imports during development. 
 			This section is stripped by the flatten plugin during install/deploy. -->
@@ -146,6 +156,5 @@
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
-
 
 </project>
